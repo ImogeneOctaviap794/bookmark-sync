@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=bookmark_sync
+      - DB_PASSWORD=bookmark_sync_pass
+      - DB_NAME=bookmark_sync
+      - JWT_SECRET=dev-secret-key
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=admin123
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  admin:
+    build: ./admin
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=bookmark_sync
+      - MYSQL_USER=bookmark_sync
+      - MYSQL_PASSWORD=bookmark_sync_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
